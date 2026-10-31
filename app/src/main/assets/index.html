@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Coach Hebdo Samy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --fg:#12161B; --muted:#5B6672; --line:#D5DBE2;
+  --gym:#2747C9; --track:#C2412A; --pool:#0B8796; --rest:#7A8590;
+  --ok:#1F8A4C; --soft:#E3E8EE;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Archivo",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0D1115; --surface:#161C22; --fg:#E8EDF2; --muted:#93A0AD; --line:#29323C;
+  --gym:#7C95FF; --track:#FF7A5C; --pool:#38C6D4; --rest:#8C97A2; --ok:#4CC27D; --soft:#1E262E; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(20px + env(safe-area-inset-top,0px)) 48px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance;line-height:1.05}
+h1{font-size:2.4rem;font-weight:800}
+h2{font-size:1.7rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:700;letter-spacing:.04em}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.sub{color:var(--muted);margin:4px 0 0}
+.cycle{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{font-family:var(--mono);font-size:.75rem;padding:4px 10px;border-radius:99px;border:1px solid var(--line);background:var(--surface);white-space:nowrap}
+.pill.phase{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+label.sm{font-size:.78rem;color:var(--muted);display:flex;gap:6px;align-items:center}
+input[type=date],input[type=number]{font:inherit;font-family:var(--mono);font-size:.85rem;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+input:focus-visible,button:focus-visible{outline:2px solid var(--gym);outline-offset:2px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 4px 10px;cursor:pointer;text-align:center;font:inherit;color:var(--fg);display:flex;flex-direction:column;gap:4px;align-items:center;position:relative;overflow:hidden}
+.day::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--c)}
+.day b{font-family:var(--display);font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase}
+.day span{font-size:.68rem;color:var(--muted);line-height:1.2}
+.day.sel{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
+.day.today b::before{content:"•";color:var(--c);margin-right:2px}
+.day.done span{color:var(--ok)}
+.session{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px;border-top:5px solid var(--c)}
+.shead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}
+.tag{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--c)}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.bar{height:6px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.box{background:var(--soft);border-radius:8px;padding:12px 14px}
+.box p,.box ul{margin:4px 0 0}
+.box ul{padding-left:18px}
+.note{font-size:.88rem;color:var(--muted)}
+.ex{display:grid;grid-template-columns:28px 1fr auto;gap:10px 12px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
+.ex:first-child{border-top:0}
+.ex input[type=checkbox]{width:22px;height:22px;accent-color:var(--ok);margin:2px 0 0}
+.ex .n{font-weight:600;font-size:1rem}
+.ex.isdone .n{text-decoration:line-through;color:var(--muted)}
+.ex .spec{font-family:var(--mono);font-size:.82rem;color:var(--c);margin-top:2px}
+.ex .tip{font-size:.85rem;color:var(--muted);margin-top:4px}
+.ex .alt{font-size:.8rem;color:var(--muted);margin-top:2px}
+.ex .alt b{font-weight:600;color:var(--fg)}
+.log{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.log input{width:74px;text-align:right}
+.log small{font-size:.7rem;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+.ex>div{min-width:0}
+.blocks{display:flex;flex-direction:column;gap:10px}
+.blk{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
+.blk .n{font-weight:600}
+.blk p{margin:2px 0 0;font-size:.92rem}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+summary{cursor:pointer;font-family:var(--display);font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+details ul{padding-left:18px;margin:10px 0 0}
+details li{margin:6px 0}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin-top:10px}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tbl{overflow-x:auto}
+button.reset{font:inherit;font-size:.8rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:4px 10px;cursor:pointer}
+@media (max-width:520px){
+  h1{font-size:1.9rem}
+  .day{padding:6px 2px 9px}.day span{display:none}
+  .session{padding:16px}
+  .ex{grid-template-columns:24px 1fr}
+  .log{grid-column:2;flex-direction:row;align-items:center;gap:8px;justify-content:flex-start}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Coach hebdo</h1>
+      <p class="sub">3 muscu · 2 athlé · 1 piscine — programme équilibré sur cycles de 4 semaines</p>
+    </div>
+    <div class="cycle">
+      <span class="pill phase" id="phase">Semaine 1</span>
+      <label class="sm" for="start">Début du cycle <input type="date" id="start"></label>
+    </div>
+  </header>
+  <nav class="days" id="days" aria-label="Jours de la semaine"></nav>
+  <section class="session" id="session" aria-live="polite"></section>
+  <details>
+    <summary>Comment progresser</summary>
+    <ul>
+      <li><b>Double progression :</b> quand tu fais le haut de la fourchette de reps sur toutes les séries avec 1–2 reps en réserve, ajoute +2,5 kg (haut du corps) ou +5 kg (bas du corps) la séance suivante.</li>
+      <li><b>RPE</b> = effort ressenti sur 10. RPE 8 = il te restait 2 reps. Ne va jamais à l'échec sur squat et soulevé de terre.</li>
+      <li><b>Semaine 4 = décharge :</b> une série de moins par exercice, charges −10 %. C'est là que le corps assimile. Ne la saute pas.</li>
+      <li>Note ta charge dans la case kg : la valeur de la semaine précédente s'affiche pour savoir quoi battre.</li>
+    </ul>
+    <div class="tbl">
+    <table>
+      <thead><tr><th>Semaine</th><th>Phase</th><th>Muscu</th><th>Athlé</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Base</td><td>RPE 7</td><td>Volume modéré</td></tr>
+        <tr><td>2</td><td>Charge</td><td>RPE 7–8</td><td>+ volume</td></tr>
+        <tr><td>3</td><td>Pic</td><td>RPE 8–9</td><td>Intensité max</td></tr>
+        <tr><td>4</td><td>Décharge</td><td>−1 série, −10 %</td><td>Facile, court</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </details>
+  <details>
+    <summary>Pourquoi cet ordre</summary>
+    <ul>
+      <li>Jambes lourdes le lundi, loin de la séance vitesse du jeudi : tu arrives frais pour sprinter.</li>
+      <li>Le mercredi travaille surtout le haut du corps : il ne fatigue pas les jambes la veille du fractionné.</li>
+      <li>Le vendredi (puissance, unilatéral, Nordic) transfère directement sur la course et la prévention des ischios.</li>
+      <li>La piscine du samedi sert de récupération active : épaules, dos, cardio sans impact.</li>
+      <li>Si tu changes l'ordre, garde au moins 48 h entre « Muscu A » et la séance vitesse.</li>
+    </ul>
+  </details>
+  <details>
+    <summary>Hors de la salle</summary>
+    <ul>
+      <li><b>Protéines :</b> 1,6 à 2 g par kg de poids de corps par jour, réparties sur 3–4 repas.</li>
+      <li><b>Glucides</b> autour des séances athlé : sans eux, le fractionné devient médiocre.</li>
+      <li><b>Sommeil :</b> 7 h 30 minimum. Avec 6 séances par semaine, c'est ta première source de progrès.</li>
+      <li><b>Douleur articulaire</b> qui persiste plus de 48 h : remplace l'exercice par son alternative et réduis la charge.</li>
+    </ul>
+    <p style="margin-top:12px"><button class="reset" id="reset" type="button">Effacer mes cases cochées et charges</button> <span class="note" id="resetMsg"></span></p>
+  </details>
+</div>
+<script>
+const S = {
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const SESS = {
+  A:{type:'gym',tag:'Muscu A',name:'Force',focus:'Bas du corps lourd + poussée',dur:'65 min',
+    warm:['5 min rameur ou vélo','Mobilité : 10 rotations de hanches, 10 fentes avec rotation, 10 flexions de cheville au mur','2 séries d\'approche légères avant le squat'],
+    ex:[
+      {id:'squat',n:'Squat barre',s:4,r:'5–6',rest:'2–3 min',tip:'Descends sous la parallèle si ta mobilité le permet. Gaine fort avant chaque rep.',alt:'Goblet squat ou presse'},
+      {id:'bench',n:'Développé couché',s:4,r:'6–8',rest:'2 min',tip:'Omoplates serrées, pieds ancrés au sol.',alt:'Développé haltères'},
+      {id:'rdl',n:'Soulevé de terre roumain',s:3,r:'8',rest:'2 min',tip:'Pousse les fesses en arrière, dos plat. Étirement des ischios, pas du dos.',alt:'Good morning léger'},
+      {id:'row1',n:'Rowing haltère un bras',s:3,r:'10 / côté',rest:'90 s',tip:'Tire le coude vers la hanche.',alt:'Rowing machine'},
+      {id:'calf',n:'Mollets debout, genou tendu',s:3,r:'12–15',rest:'60 s',tip:'Pause 1 s en haut. Les mollets protègent tes tendons d\'Achille en course.',alt:'Mollets à la presse'},
+      {id:'pallof',n:'Pallof press',s:3,r:'10 / côté',rest:'60 s',tip:'Résiste à la rotation, bassin immobile.',alt:'Planche'}
+    ]},
+  B:{type:'gym',tag:'Muscu B',name:'Haut du corps',focus:'Tirage, épaules, gainage — jambes épargnées avant la vitesse',dur:'60 min',
+    warm:['5 min rameur','Épaules : 15 rotations avec élastique, 10 pull-aparts','1 série légère de tractions ou tirage'],
+    ex:[
+      {id:'pullup',n:'Tractions',s:4,r:'6–10',rest:'2 min',tip:'Amplitude complète. Ajoute du lest quand tu fais 10 propres.',alt:'Tirage vertical poulie'},
+      {id:'ohp',n:'Développé militaire haltères',s:3,r:'8–10',rest:'90 s',tip:'Fessiers serrés, ne cambre pas.',alt:'Développé machine'},
+      {id:'row2',n:'Rowing poulie basse',s:3,r:'10',rest:'90 s',tip:'Poitrine sortie, serre les omoplates 1 s.',alt:'Rowing barre'},
+      {id:'dips',n:'Dips',s:3,r:'8–12',rest:'90 s',tip:'Descends jusqu\'à 90° au coude, pas plus si l\'épaule tire.',alt:'Pompes lestées'},
+      {id:'face',n:'Face pull',s:3,r:'15',rest:'60 s',tip:'Santé des épaules : utile pour la natation.',alt:'Oiseau haltères'},
+      {id:'hipb',n:'Hip thrust',s:3,r:'10',rest:'90 s',tip:'Charge modérée (RPE 7) : on active sans fatiguer avant le jeudi.',alt:'Pont fessier au sol'},
+      {id:'core',n:'Planche latérale + dead bug',s:3,r:'35 s / côté + 10',rest:'45 s',tip:'Enchaîne les deux en circuit.',alt:'Planche classique'}
+    ]},
+  C:{type:'gym',tag:'Muscu C',name:'Puissance & unilatéral',focus:'Explosivité, une jambe à la fois, prévention ischios',dur:'65 min',
+    warm:['5 min vélo','Gammes : 2×10 m montées de genoux, talons-fesses, pas chassés','3 sauts sur place progressifs'],
+    ex:[
+      {id:'box',n:'Sauts sur box',s:4,r:'4',rest:'90 s',tip:'Qualité maximale. Descends du box en marchant, ne saute pas en arrière.',alt:'Sauts verticaux'},
+      {id:'trap',n:'Soulevé de terre trap bar',s:3,r:'5',rest:'2 min',tip:'Environ 70 % de ton max, monte la barre le plus vite possible.',alt:'Soulevé de terre classique'},
+      {id:'bulg',n:'Fentes bulgares',s:3,r:'8 / jambe',rest:'90 s',tip:'Commence par la jambe la plus faible.',alt:'Fentes marchées'},
+      {id:'incl',n:'Développé incliné haltères',s:3,r:'8–10',rest:'90 s',tip:'Banc à 30°.',alt:'Pompes pieds surélevés'},
+      {id:'lat',n:'Tirage poitrine prise serrée',s:3,r:'10–12',rest:'90 s',tip:'Contrôle la descente sur 2 s.',alt:'Tractions supination'},
+      {id:'nordic',n:'Nordic hamstring curl',s:3,r:'4–6',rest:'90 s',tip:'Freine la descente le plus longtemps possible. L\'exercice n°1 contre les claquages en sprint.',alt:'Leg curl allongé, descente lente'},
+      {id:'farmer',n:'Farmer walk',s:3,r:'30 m',rest:'60 s',tip:'Haltères lourds, buste droit, pas courts.',alt:'Suitcase carry un bras'}
+    ]},
+  T1:{type:'track',tag:'Athlé 1',name:'Endurance & tempo',focus:'Base aérobie et allure régulière',dur:'50–60 min',
+    warm:'15 min footing lent + gammes (montées de genoux, talons-fesses, foulées bondissantes) + 2 accélérations progressives sur 80 m',
+    main:['35 min de footing en aisance respiratoire (tu peux parler)','Tempo : 3 × 8 min allure soutenue, récup 2 min trot','Tempo : 4 × 8 min allure soutenue, récup 2 min trot','25 min de footing facile, sans montre'],
+    cool:'4 lignes droites de 80 m relâchées, puis 5 min de marche et étirements légers des mollets et fléchisseurs de hanche'},
+  T2:{type:'track',tag:'Athlé 2',name:'Vitesse & VMA',focus:'Fractionné court, foulée rapide',dur:'60 min',
+    warm:'20 min : footing 10 min, gammes complètes, 3 accélérations de 60 m à 70–80–90 %',
+    main:['10 × 200 m vite, récup 1 min 30 en marchant','6 × 400 m à allure VMA, récup 2 min','6 × 60 m sprint max, récup complète (3 min) + 4 × 150 m à 85 %','6 × 200 m à 80 %, récup 2 min (garde de la réserve)'],
+    cool:'10 min de footing très lent puis marche. Hydrate-toi et mange dans l\'heure qui suit'},
+  P:{type:'pool',tag:'Piscine',name:'Récupération active',focus:'Technique, épaules, cardio sans impact',dur:'40–45 min',
+    warm:'300 m en variant les nages, très souple',
+    main:['4 × 50 m éducatifs (rattrapé, pull-buoy) + 8 × 50 m crawl souple, récup 20 s','4 × 50 m éducatifs + 6 × 100 m crawl régulier, récup 20 s','4 × 50 m éducatifs + 4 × 150 m crawl régulier, récup 30 s','600 m continus très souple, toutes nages'],
+    cool:'200 m dos ou brasse relâché, puis 5 min de mobilité d\'épaules au bord du bassin'},
+  R:{type:'rest',tag:'Repos',name:'Récupération',focus:'Aucune séance',dur:'—',
+    text:['Marche de 20–30 min si tu as envie de bouger.','10 min de mobilité : hanches, chevilles, colonne thoracique.','Prépare tes repas et ta semaine.']}
+};
+const WEEK=[['Lun','A'],['Mar','T1'],['Mer','B'],['Jeu','T2'],['Ven','C'],['Sam','P'],['Dim','R']];
+const PH=[['Base','RPE 7'],['Charge','RPE 7–8'],['Pic','RPE 8–9'],['Décharge','RPE 6 · −1 série · −10 %']];
+const COL={gym:'var(--gym)',track:'var(--track)',pool:'var(--pool)',rest:'var(--rest)'};
+const iso=d=>d.toISOString().slice(0,10);
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+const today=new Date(), todayIdx=(today.getDay()+6)%7;
+let start=S.get('cycleStart',null);
+if(!start){start=iso(new Date(mondayOf(today).getTime()-mondayOf(today).getTimezoneOffset()*6e4));}
+const startEl=document.getElementById('start');startEl.value=start;
+let sel=todayIdx;
+function cycleWeek(){const s=new Date(start+'T00:00:00');const m=mondayOf(today),sm=mondayOf(s);const w=Math.floor(Math.round((m-sm)/864e5)/7);return ((w%4)+4)%4;}
+function weekKey(){const m=mondayOf(today);return m.getFullYear()+'-'+(m.getMonth()+1)+'-'+m.getDate()}
+function lastWeekKey(){const m=mondayOf(today);m.setDate(m.getDate()-7);return m.getFullYear()+'-'+(m.getMonth()+1)+'-'+m.getDate()}
+function doneSet(k){return S.get('done:'+weekKey()+':'+k,[])}
+function isDayDone(k){const s=SESS[k];if(s.type==='rest')return false;const d=doneSet(k);const total=s.type==='gym'?s.ex.length:3;return d.length>=total}
+function renderDays(){
+  const box=document.getElementById('days');box.innerHTML='';
+  WEEK.forEach(([d,k],i)=>{
+    const s=SESS[k];const b=document.createElement('button');b.type='button';
+    b.className='day'+(i===sel?' sel':'')+(i===todayIdx?' today':'')+(isDayDone(k)?' done':'');
+    b.style.setProperty('--c',COL[s.type]);
+    b.innerHTML='<b>'+d+'</b><span>'+(isDayDone(k)?'Fait ✓':s.tag)+'</span>';
+    b.setAttribute('aria-pressed',i===sel);
+    b.onclick=()=>{sel=i;render()};
+    box.appendChild(b);
+  });
+}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function renderSession(){
+  const [dname,k]=WEEK[sel]; const s=SESS[k]; const w=cycleWeek(); const el=document.getElementById('session');
+  el.style.setProperty('--c',COL[s.type]);
+  const dfull=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'][sel];
+  let h='<div class="shead"><div><div class="tag">'+dfull+(sel===todayIdx?' · aujourd\'hui':'')+' · '+s.tag+'</div><h2>'+s.name+'</h2><p class="note" style="margin:4px 0 0">'+s.focus+'</p></div><div class="meta"><span class="pill">'+s.dur+'</span>'+(s.type!=='rest'?'<span class="pill">S'+(w+1)+' · '+PH[w][0]+'</span>':'')+'</div></div>';
+  const done=doneSet(k);
+  if(s.type==='gym'){
+    const total=s.ex.length;
+    h+='<div class="bar" aria-hidden="true"><i style="width:'+(done.length/total*100)+'%"></i></div>';
+    h+='<div class="box"><h3>Échauffement · 8–10 min</h3><ul>'+s.warm.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
+    h+='<div class="note">Intensité cette semaine : <b>'+PH[w][1]+'</b></div><div>';
+    s.ex.forEach(e=>{
+      const sets=w===3?Math.max(2,e.s-1):e.s; const on=done.includes(e.id);
+      const cur=S.get('kg:'+weekKey()+':'+e.id,''); const prev=S.get('kg:'+lastWeekKey()+':'+e.id,'');
+      const noKg=['core','box','pallof'].includes(e.id);
+      h+='<div class="ex'+(on?' isdone':'')+'"><input type="checkbox" id="c_'+e.id+'" data-id="'+e.id+'" '+(on?'checked':'')+' aria-label="Exercice fait">'+
+        '<div><label for="c_'+e.id+'" class="n">'+esc(e.n)+'</label><div class="spec">'+sets+' × '+esc(e.r)+' · repos '+e.rest+'</div><div class="tip">'+esc(e.tip)+'</div><div class="alt"><b>Alternative :</b> '+esc(e.alt)+'</div></div>'+
+        (noKg?'<div></div>':'<div class="log"><input type="number" inputmode="decimal" step="0.5" min="0" id="kg_'+e.id+'" data-kg="'+e.id+'" value="'+esc(cur)+'" placeholder="kg" aria-label="Charge en kg"><small>'+(prev!==''?'sem. passée : '+esc(prev)+' kg':'pas encore noté')+'</small></div>')+
+      '</div>';
+    });
+    h+='</div>';
+  } else if(s.type==='track'||s.type==='pool'){
+    const steps=[['warm','Échauffement',s.warm],['main','Corps de séance · semaine '+(w+1),s.main[w]],['cool','Retour au calme',s.cool]];
+    h+='<div class="bar" aria-hidden="true"><i style="width:'+(done.length/3*100)+'%"></i></div><div class="blocks">';
+    steps.forEach(([id,t,txt])=>{const on=done.includes(id);
+      h+='<div class="blk ex'+(on?' isdone':'')+'" style="grid-template-columns:28px 1fr"><input type="checkbox" id="c_'+id+'" data-id="'+id+'" '+(on?'checked':'')+' aria-label="Bloc fait"><div><label for="c_'+id+'" class="n">'+t+'</label><p>'+esc(txt)+'</p></div></div>';});
+    h+='</div>';
+    if(s.type==='track')h+='<p class="note">Pointes ou chaussures légères pour le fractionné. Si les jambes sont lourdes de la muscu, réduis d\'une répétition plutôt que de ralentir l\'allure.</p>';
+    else h+='<p class="note">Reste facile : tu dois sortir de l\'eau plus frais qu\'en arrivant.</p>';
+  } else {
+    h+='<div class="box"><ul>'+s.text.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
+  }
+  el.innerHTML=h;
+  el.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>{
+    const key='done:'+weekKey()+':'+k; let d=S.get(key,[]);
+    d=c.checked?[...new Set([...d,c.dataset.id])]:d.filter(x=>x!==c.dataset.id); S.set(key,d); render();
+  });
+  el.querySelectorAll('input[data-kg]').forEach(i=>i.onchange=()=>S.set('kg:'+weekKey()+':'+i.dataset.kg,i.value));
+}
+function render(){
+  const w=cycleWeek();
+  document.getElementById('phase').textContent='Semaine '+(w+1)+'/4 · '+PH[w][0];
+  renderDays();renderSession();
+}
+startEl.onchange=()=>{if(startEl.value){start=startEl.value;S.set('cycleStart',start);render()}};
+document.getElementById('reset').onclick=function(){
+  const msg=document.getElementById('resetMsg');
+  if(this.dataset.arm!=='1'){this.dataset.arm='1';this.textContent='Confirmer l\'effacement';msg.textContent='Clique encore pour confirmer.';return}
+  try{Object.keys(localStorage).filter(k=>k.startsWith('done:')||k.startsWith('kg:')).forEach(k=>localStorage.removeItem(k))}catch(e){}
+  this.dataset.arm='';this.textContent='Effacer mes cases cochées et charges';msg.textContent='Données effacées.';render();
+};
+render();
+</script>
+</body>
+</html>
